@@ -2,3 +2,5 @@ boto3==1.28.85
 Flask==3.0.0
 Werkzeug==3.0.1
 markupsafe==2.1.3
+python-dotenv==1.0.0
+Watchdog==3.0.0
