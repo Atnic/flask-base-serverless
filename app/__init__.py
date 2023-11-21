@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, jsonify, make_response
+from flask_restful import Api
 
 
 def create_app(test_config=None):
@@ -29,7 +30,12 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
     seeder.init_app(app, db)
 
-    from app.model import user
+    api = Api(app)
+
+    from app.resource.user_resource import UserListResource, UserResource
+
+    api.add_resource(UserListResource, '/users')
+    api.add_resource(UserResource, '/users/<int:key>')
 
     # a simple page that says hello
     @app.route('/hello')

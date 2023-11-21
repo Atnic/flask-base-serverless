@@ -8,3 +8,4 @@ Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.5
 Flask-Seeder==1.2.0
 bcrypt==4.0.1
+flask-restful==0.3.10

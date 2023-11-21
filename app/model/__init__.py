@@ -6,6 +6,8 @@ from sqlalchemy.exc import OperationalError
 
 
 class Model(BaseModel):
+    hidden_fields = []
+
     @classmethod
     def get_pks(cls):
         return tuple(key.name for key in inspect(cls).primary_key)
@@ -27,10 +29,10 @@ class Model(BaseModel):
         try:
             if self.get_pk_values() is None:
                 if hasattr(self, 'created_at'):
-                    self.created_at = datetime.datetime.now()
+                    self.created_at = datetime.datetime.utcnow()
                 self.query.session.add(self)
             if hasattr(self, 'updated_at'):
-                self.updated_at = datetime.datetime.now()
+                self.updated_at = datetime.datetime.utcnow()
             self.query.session.commit()
         except OperationalError as e:
             self.query.session.rollback()
@@ -43,3 +45,23 @@ class Model(BaseModel):
         except OperationalError as e:
             self.query.session.rollback()
             raise e
+
+    def to_dict(self):
+        data: dict = {}
+        columns = self.__table__.columns
+        for column in columns:
+            if column.name in self.hidden_fields:
+                continue
+            c = getattr(self, column.name)
+            if isinstance(c, datetime.datetime):
+                c = c.isoformat()
+            data[column.name] = c
+        return data
+
+    def set_dict(self, data: dict):
+        columns = self.__table__.columns
+        for key, value in data.items():
+            if key in columns:
+                setattr(self, key, value)
+
+        return self
