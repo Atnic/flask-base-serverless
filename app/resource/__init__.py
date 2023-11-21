@@ -5,6 +5,20 @@ from flask_sqlalchemy.pagination import Pagination
 from app.model import Model
 
 
+def auth_required(func):
+    def wrapper(*args, **kwargs):
+        api_key = request.headers.get("X-Api-Key", request.args.get('api_key', None))
+        if not api_key:
+            return {"message": "API key is required"}, 401
+        from app.model.api_key import ApiKey
+        api_key = ApiKey.query.get(api_key)
+        if api_key:
+            return func(*args, **kwargs)
+        return {"message": "Invalid API key"}, 401
+
+    return wrapper
+
+
 class ModelListResource(Resource):
     model = Model
 

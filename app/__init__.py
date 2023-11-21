@@ -33,9 +33,12 @@ def create_app(test_config=None):
     api = Api(app)
 
     from app.resource.user_resource import UserListResource, UserResource
+    from app.resource.api_key_resource import ApiKeyListResource, ApiKeyResource
 
     api.add_resource(UserListResource, '/users')
     api.add_resource(UserResource, '/users/<int:key>')
+    api.add_resource(ApiKeyListResource, '/api_keys')
+    api.add_resource(ApiKeyResource, '/api_keys/<string:key>')
 
     # a simple page that says hello
     @app.route('/hello')
