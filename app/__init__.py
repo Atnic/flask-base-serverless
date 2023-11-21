@@ -24,9 +24,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from .db import db, migrate
+    from .db import db, migrate, seeder
     db.init_app(app)
     migrate.init_app(app, db)
+    seeder.init_app(app, db)
 
     from app.model import user
 
