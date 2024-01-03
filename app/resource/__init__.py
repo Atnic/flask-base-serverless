@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, g
 from flask_restful import Resource
 from flask_sqlalchemy.pagination import Pagination
 
@@ -12,9 +12,10 @@ def auth_required(func):
             return {"message": "API key is required"}, 401
         from app.model.api_key import ApiKey
         api_key = ApiKey.query.get(api_key)
-        if api_key:
-            return func(*args, **kwargs)
-        return {"message": "Invalid API key"}, 401
+        if not api_key:
+            return {"message": "Invalid API key"}, 401
+        g.user = api_key.user
+        return func(*args, **kwargs)
 
     return wrapper
 
@@ -45,7 +46,7 @@ class ModelListResource(Resource):
             model = self.model()
             model.set_dict(data)
             model.save()
-        return model, 201
+        return model.to_dict(), 201
 
 
 class ModelResource(Resource):
@@ -53,7 +54,7 @@ class ModelResource(Resource):
 
     def get(self, key):
         model = self.model.query.get_or_404(key)
-        return model
+        return model.to_dict()
 
     def put(self, key):
         model = self.model.query.get_or_404(key)
@@ -61,9 +62,9 @@ class ModelResource(Resource):
         with self.model.query.session.no_autoflush:
             model.set_dict(data)
             model.save()
-        return model
+        return model.to_dict()
 
     def delete(self, key):
         model = self.model.query.get_or_404(key)
         model.delete()
-        return model
+        return model.to_dict()

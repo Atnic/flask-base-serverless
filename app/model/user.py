@@ -1,3 +1,5 @@
+import bcrypt
+
 from app.db import db
 
 
@@ -10,3 +12,6 @@ class User(db.Model):
     password = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, nullable=True, default=db.func.now())
     updated_at = db.Column(db.DateTime, nullable=True, default=db.func.now())
+
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))
