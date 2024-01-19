@@ -5,17 +5,42 @@ frameworkVersion: '3'
 custom:
   wsgi:
     app: handler.app
+  pythonRequirements:
+    noDeploy:
+      - boto3
 
 provider:
   name: aws
   runtime: python3.9
 
+useDotenv: true
+
+package:
+  patterns:
+    - '!node_modules/**'
+
 functions:
   api:
     handler: wsgi_handler.handler
+    timeout: 29
     events:
-      - httpApi: '*'
+      - http:
+          path: /
+          method: ANY
+          cors:
+            origin: '*'
+            headers: '*'
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: '*'
+            headers: '*'
+    environment:
+      FLASK_APP: app
+      API_GATEWAY_BASE_PATH: ${env:API_GATEWAY_BASE_PATH, ''}
 
 plugins:
   - serverless-wsgi
   - serverless-python-requirements
+  - serverless-offline

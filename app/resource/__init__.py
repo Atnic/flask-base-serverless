@@ -1,3 +1,5 @@
+import functools
+
 from flask import request, jsonify, g
 from flask_restful import Resource
 from flask_sqlalchemy.pagination import Pagination
@@ -6,6 +8,7 @@ from app.model import Model
 
 
 def auth_required(func):
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         api_key = request.headers.get("X-Api-Key", request.args.get('api_key', None))
         if not api_key:
@@ -17,7 +20,11 @@ def auth_required(func):
         g.user = api_key.user
         return func(*args, **kwargs)
 
-    return wrapper
+    try:
+        if request:
+            return wrapper
+    except RuntimeError:
+        return func
 
 
 class ModelListResource(Resource):

@@ -1,0 +1,53 @@
+image: public.ecr.aws/sam/build-python3.9:latest-x86_64
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - curl -O https://nodejs.org/dist/v16.19.1/node-v16.19.1-linux-x64.tar.xz
+  - tar -xf node-v16.19.1-linux-x64.tar.xz
+  - mv node-v16.19.1-linux-x64 /usr/local/node
+  - export PATH=$PATH:/usr/local/node/bin
+  - rm node-v16.19.1-linux-x64.tar.xz
+
+npm:
+  stage: build
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-npm
+    paths:
+      - node_modules/
+  script:
+    - npm install
+  only:
+    - develop
+    - master
+  artifacts:
+    expire_in: 1 month
+    paths:
+      - node_modules/
+
+
+dev:
+  stage: deploy
+  dependencies:
+    - npm
+  script:
+    - npm install -g serverless
+    - cp $ENV_FILE .env
+    - serverless deploy --region ap-southeast-1 --verbose
+  environment: dev
+  only:
+    - develop
+
+prod:
+  stage: deploy
+  dependencies:
+    - npm
+  script:
+    - npm install -g serverless
+    - cp $ENV_FILE .env
+    - serverless deploy --stage prod --region ap-southeast-1 --verbose
+  environment: prod
+  only:
+    - master
