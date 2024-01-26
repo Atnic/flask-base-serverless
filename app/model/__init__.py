@@ -48,14 +48,16 @@ class Model(BaseModel):
 
     def to_dict(self):
         data: dict = {}
-        columns = self.__table__.columns
+        columns = self.__dict__.keys()
         for column in columns:
-            if column.name in self.hidden_fields:
+            if column.startswith('_'):
                 continue
-            c = getattr(self, column.name)
+            if column in self.hidden_fields:
+                continue
+            c = getattr(self, column)
             if isinstance(c, datetime.datetime):
                 c = c.isoformat()
-            data[column.name] = c
+            data[column] = c
         return data
 
     def set_dict(self, data: dict):

@@ -34,7 +34,8 @@ dev:
     - npm
   script:
     - npm install -g serverless
-    - cp $ENV_FILE .env
+    - mkdir instance
+    - cp $CONFIG_FILE instance/config.py
     - serverless deploy --region ap-southeast-1 --verbose
   environment: dev
   only:
@@ -46,7 +47,8 @@ prod:
     - npm
   script:
     - npm install -g serverless
-    - cp $ENV_FILE .env
+    - mkdir instance
+    - cp $CONFIG_FILE instance/config.py
     - serverless deploy --stage prod --region ap-southeast-1 --verbose
   environment: prod
   only:

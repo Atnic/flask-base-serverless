@@ -5,6 +5,10 @@ from app.model.user import User
 
 
 class UserSeeder(Seeder):
+    def __init__(self, db=None):
+        super().__init__(db=db)
+        self.priority = 0
+
     def run(self):
         user = User.query.filter(
             User.email == "admin@admin.com"

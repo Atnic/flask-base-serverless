@@ -12,3 +12,8 @@ requests==2.31.0
 flask-restful==0.3.10
 flask-cors==4.0.0
 simplejson==3.19.2
+sshtunnel==0.4.0
+pydash==7.0.6
+serverless-wsgi==3.0.3
+PyMySQL[rsa]==1.1.0
+

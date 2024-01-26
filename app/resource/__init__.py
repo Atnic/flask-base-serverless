@@ -10,6 +10,8 @@ from app.model import Model
 def auth_required(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        if 'user' in g and g.user:
+            return func(*args, **kwargs)
         api_key = request.headers.get("X-Api-Key", request.args.get('api_key', None))
         if not api_key:
             return {"message": "API key is required"}, 401
@@ -21,8 +23,7 @@ def auth_required(func):
         return func(*args, **kwargs)
 
     try:
-        if request:
-            return wrapper
+        return wrapper
     except RuntimeError:
         return func
 

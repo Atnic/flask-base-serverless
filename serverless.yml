@@ -21,7 +21,7 @@ package:
 
 functions:
   api:
-    handler: wsgi_handler.handler
+    handler: handler.handler
     timeout: 29
     events:
       - http:
